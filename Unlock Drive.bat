@@ -82,7 +82,7 @@ rem If there's 10 volumes, they will be numbered 0-9.
 rem findstr finds 10 matches, and new volume index is 10, so no reason to increment.
 set volumeNum=
 (findstr /R /C:"Volume [0-9][0-9 ] " "%~dp0diskout.txt" | find /C " ") > "%~dp0volumenum.txt"
-for /F "delims=" %%A in (%~dp0\volumenum.txt) do set volumeNum=%%A
+for /F "delims=" %%A in (%~dp0volumenum.txt) do set volumeNum=%%A
 
 rem empty file, then append all lines with NEWVOLINDEX replaced
 break> %~dp0DiskPart_PreUnlockDynamic.txt
