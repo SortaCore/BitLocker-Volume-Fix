@@ -23,11 +23,12 @@ if not errorLevel 0 (
 	exit
 )
 
-pause
+rem For useful errorlevel checks
+setlocal EnableExtensions
 rem Check no %interimLetter%\ drive connected, if so, ask to continue and remove the letter
 echo select volume %interimLetter%: | diskpart | find "The volume you selected is not valid or does not exist." > nul
 rem errorlevel 0 means found it
-IF not errorlevel 0 (
+IF %errorlevel% NEQ 0 (
 	rem TODO: Currently unsafe, as %interimLetter%:\ may not be virtual disk file we expect it to be. Prompt first.
 	echo %interimLetter%:\ drive mounted at start.
 	choice /C YN /N /M "Press Y to REMOVE %interimLetter%: DRIVE LETTER from whatever it's attached to [Y/N]? "
@@ -49,7 +50,7 @@ rem note that a disk that is detached may still show up as status "Added", type 
 rem When actually attached, status "Attached, not open" and type "Expandable"
 (echo list vdisk | diskpart | findstr /C:"%vhdPath%" | findstr "Expandable") > nul
 rem errorlevel 0 means found it
-IF errorlevel 0 (
+IF %errorlevel% EQU 0 (
 	echo Warning: Disk already attached. Performing dismount.
 	choice /C YN /N /M "Press Y to continue [Y/N]? "
 	if errorlevel 2 (
@@ -69,8 +70,8 @@ rem Generate unlock/lock scripts for BitLocker.
 SETLOCAL EnableDelayedExpansion
 rem Check no %endLetter%:\ drive connected
 echo select volume %endLetter%: | diskpart | find "The volume you selected is not valid or does not exist."
-rem errorlevel 0 means found it
-IF not errorlevel 0 (
+rem errorlevel 0 means found it, so
+IF %errorlevel% NEQ 0 (
 	echo FATAL ERROR
 	echo %endLetter%:\ drive mounted at start. Dismount it, and run script again.
 	pause
@@ -115,18 +116,19 @@ echo Press a key to open password prompt...
 pause
 rem Any services that use %endLetter%:\ drive you might want to stop here.
 
-endlocal
+rem Disable delayed expansion
+ENDLOCAL
 :userUnlock
 echo Running unlock drive, please enter password...
 rem The drive is unlocked on letter %interimLetter%:, then rewritten to %endLetter%:
-start "Waiting for unlock" /WAIT bdeunlock %interimLetter%: > nul
+start "Waiting for unlock" /WAIT "C:\Windows\System32\bdeunlock.exe" %interimLetter%: > nul
 echo Expected decrypted, waiting for 15 seconds as per docs...
 
 timeout /T 15 /NOBREAK > nul
 rem Should be decrypted now. If it is, the filesystem will show up valid, otherwise as Unkno[wn]
 (echo list volume | diskpart | findstr /C:"Volume %volumeNum%" | findstr "Unkno") > nul
 rem errorlevel 0 means found it, so if not found
-IF errorlevel 0 (
+IF  %errorlevel% NEQ 0 (
 	choice /C YN /N /M "Did not decrypt properly. [Y/N]? "
 	if errorlevel 2 (
 		pause
