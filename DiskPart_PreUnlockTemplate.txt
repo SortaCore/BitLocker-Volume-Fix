@@ -6,5 +6,3 @@ select vdisk file="VHDPATH"
 detach vdisk
 select vdisk file="VHDPATH"
 attach vdisk
-select volume NEWVOLINDEX
-assign letter=ENDLETTER

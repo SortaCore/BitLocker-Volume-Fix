@@ -1,0 +1,4 @@
+rem Since a Windows update done 28th Jan 2021, a delay is necessary,
+rem otherwise it claims that volume NEWVOLINDEX does not exist.
+select volume NEWVOLINDEX
+assign letter=ENDLETTER

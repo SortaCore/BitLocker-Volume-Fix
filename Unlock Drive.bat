@@ -87,6 +87,7 @@ for /F "delims=" %%A in (%~dp0volumenum.txt) do set volumeNum=%%A
 
 rem empty file, then append all lines with NEWVOLINDEX replaced
 break> %~dp0DiskPart_PreUnlockDynamic.txt
+break> %~dp0DiskPart_PreUnlockDynamic2.txt
 break> %~dp0DiskPart_PostUnlockDynamic.txt
 for /F "delims=" %%A in (%~dp0DiskPart_PreUnlockTemplate.txt) do (
 	set "string=%%A"
@@ -96,6 +97,15 @@ for /F "delims=" %%A in (%~dp0DiskPart_PreUnlockTemplate.txt) do (
 	set "string=!modified!"
 	set "modified=!string:VHDPATH=%vhdPath%!"
 	echo !modified!>> %~dp0DiskPart_PreUnlockDynamic.txt
+)
+for /F "delims=" %%A in (%~dp0DiskPart_PreUnlockTemplate2.txt) do (
+	set "string=%%A"
+	set "modified=!string:NEWVOLINDEX=%volumeNum%!"
+	set "string=!modified!"
+	set "modified=!string:ENDLETTER=%endLetter%!"
+	set "string=!modified!"
+	set "modified=!string:VHDPATH=%vhdPath%!"
+	echo !modified!>> %~dp0DiskPart_PreUnlockDynamic2.txt
 )
 for /F "delims=" %%A in (%~dp0DiskPart_PostUnlockTemplate.txt) do (
 	set "string=%%A"
