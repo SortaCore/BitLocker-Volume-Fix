@@ -119,7 +119,10 @@ for /F "delims=" %%A in (%~dp0DiskPart_PostUnlockTemplate.txt) do (
 	echo !modified!>> %~dp0DiskPart_PostUnlockDynamic.txt
 )
 
-start "Mounting encrypted drive..." "C:\Windows\System32\diskpart.exe" /s "%~dp0DiskPart_PreUnlockDynamic.txt" > nul
+start "Mounting encrypted drive..." /WAIT "C:\Windows\System32\diskpart.exe" /s "%~dp0DiskPart_PreUnlockDynamic.txt" > nul
+echo Expected a detached drive, waiting for 15 seconds as per docs...
+timeout /T 15 /NOBREAK > nul
+start "Mounting encrypted drive..." /WAIT "C:\Windows\System32\diskpart.exe" /s "%~dp0DiskPart_PreUnlockDynamic2.txt" > nul
 
 echo Completed mount, still drive unlocking to do.
 echo Press a key to open password prompt...
